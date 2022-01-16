@@ -18,6 +18,4 @@ jobs:
                   go-version: 1.17
 
             - name: Test
-              run: "go test tracexit"
-              env:
-                  GOROOT: "$(pwd)"
+              run: "go test -v"
