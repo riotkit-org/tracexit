@@ -1,4 +1,4 @@
-package main
+package tracexit
 
 import (
 	"github.com/stretchr/testify/assert"
