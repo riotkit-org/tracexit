@@ -1,4 +1,4 @@
-package tracexit
+package main
 
 import "strings"
 
