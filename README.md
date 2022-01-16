@@ -8,7 +8,8 @@ It's a simple CLI application just like `tee`, can be used together with tools l
 
 ## Input
 
-`tracexit` does not take any commandline switches, everything is passed through to the child process.
+`tracexit` does not take any commandline switches except `--help` / `-h`, everything is passed through to the child process.
+To use `--help` / `-h` it must be written as first argument, right after `tracexit`.
 
 **Environment variables:**
 - TRACEXIT_EXIT_CODE_PATH: File location where to store exit code of a process when it exits
