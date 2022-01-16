@@ -1,80 +1,39 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
-	"os/exec"
-	"path/filepath"
-	"syscall"
 )
 
-func getProgramArgs() []string {
-	return os.Args[2:]
-}
-
-func getProcessName() string {
-	return os.Args[1]
-}
-
-func StartProcess() *exec.Cmd {
-	cmd := exec.Command(getProcessName(), getProgramArgs()...)
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Start(); err != nil {
-		log.Errorf("Cannot start process: %v", err)
-		os.Exit(10)
-	}
-
-	return cmd
-}
-
-func waitAndRetrieveStatusCode(cmd *exec.Cmd) int {
-	code := 0
-
-	if err := cmd.Wait(); err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			if status, ok := exitError.Sys().(syscall.WaitStatus); ok {
-				code = status.ExitStatus()
-			}
-		}
-	}
-	return code
-}
-
-func saveExitCode(code int, path string) error {
-	dir := filepath.Dir(path)
-
-	if _, err := os.Stat(dir); !os.IsNotExist(err) {
-		_ = os.MkdirAll(dir, 0644)
-	}
-
-	return os.WriteFile(path, []byte(string(rune(code))), 0644)
-}
-
-func exit(code int) {
-	os.Exit(code)
-}
-
 func main() {
-	whereToSaveExitCode := os.Getenv("TRACEXIT_EXIT_CODE_PATH")
-
-	if whereToSaveExitCode == "" {
-		log.Error("'TRACEXIT_EXIT_CODE_PATH' environment variable needs to be set")
-		os.Exit(22)
+	if len(os.Args) > 1 && (os.Args[1] == "--help" || os.Args[1] == "-h") {
+		fmt.Printf("Usage: %v env:SOME=env_value my-application --option1 --option2 -a -b -c\n", os.Args[0])
+		fmt.Println("")
+		fmt.Println("Functionality")
+		fmt.Println("=============")
+		fmt.Println("- Receive exit code as text file when process ends: Set TRACEXIT_EXIT_CODE_PATH to a path to have exit code written to file at selected path")
+		fmt.Println("- Set any environment variable before process name, so it will be passed to inside the process only. Helpful in environments, where you cannot adjust shell settings and can run only single, encapsulated process e.g. ['my-process', '--my-arg']")
+		fmt.Println("")
+		os.Exit(1)
 	}
 
-	if len(os.Args) < 2 {
+	environmentToApply, remainingArgs := parseEnvironmentVariables(os.Args[1:])
+
+	if len(remainingArgs) < 1 {
 		log.Error("No command specified.")
 		os.Exit(22)
 	}
 
-	cmd := StartProcess()
+	cmd := StartProcess(getProcessName(remainingArgs), remainingArgs[1:], environmentToApply)
 	code := waitAndRetrieveStatusCode(cmd)
-	if err := saveExitCode(code, whereToSaveExitCode); err != nil {
-		log.Errorf("Cannot write status to file: %v", err)
-		exit(5)
+
+	whereToSaveExitCode := os.Getenv("TRACEXIT_EXIT_CODE_PATH")
+	if whereToSaveExitCode != "" {
+		if err := saveExitCode(code, whereToSaveExitCode); err != nil {
+			log.Errorf("Cannot write status to file: %v", err)
+			exit(5)
+		}
 	}
 
 	exit(code)

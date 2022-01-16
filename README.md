@@ -4,7 +4,7 @@ tracexit
 `Trace command till it Exits`
 
 Spawns process and tracks it till it runs, then stores its status code in a file.
-It's a simple CLI application just like `tee`, can be used together with `tee`.
+It's a simple CLI application just like `tee`, can be used together with tools like `tee`.
 
 ## Input
 
@@ -15,9 +15,22 @@ It's a simple CLI application just like `tee`, can be used together with `tee`.
 
 ## Usage examples
 
+### Export exit code to file "/tmp/exit-code" after process finishes.
+
 ```bash
 export TRACEXIT_EXIT_CODE_PATH=/tmp/exit-code
 tracexit mysqldump -u root -psomething | tee out.log
+```
+
+### Set extra environment variables and pass to the process
+
+Useful when spawning a process in an environment, that does not allow adjusting shell settings.
+
+Use case:
+*Kubernetes library in Python does not allow passing environment variables. To preserve full escaping possibility (spawning process as list of strings) and avoid invoking extra `/bin/bash` we use `tracexit` to set environment variables within a wrapper process.*
+
+```bash
+tracexit env:SOME=thing mysqldump -u root -psomething
 ```
 
 ## Use case
