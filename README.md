@@ -34,6 +34,14 @@ Use case:
 tracexit env:SOME=thing mysqldump -u root -psomething
 ```
 
+**Appending paths:**
+
+```bash
+tracexit env:PATH+kubectl=/opt/kubectl kubectl get pods -A
+```
+
+tracexit can concatenate variables - which means taking e.g. "PATH" real value and appending ":/opt/kubectl" in above example.
+
 ## Use case
 
 Invoking a process in a container, or in remote shell, but the library does not return exit code of executed command.
@@ -52,4 +60,10 @@ exit_code, stream = container.exec_run(['tracexit', 'some-command'], stream=True
 
 # exit_code = None
 # stream is of Generator type, after it ends we do not get exit code, only we know when output ends
+```
+
+### Example - with `kubectl`
+
+```bash
+kubectl exec -it deployment/my-deployment-name -- tracexit env:PWD=/mnt/
 ```

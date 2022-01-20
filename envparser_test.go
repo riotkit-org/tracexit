@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
@@ -31,4 +32,32 @@ func TestParseEnvironmentVariables_VariablesWithoutValueShouldBeIgnored(t *testi
 
 	assert.Equal(t, 0, len(out))
 	assert.Equal(t, 1, len(remainingArgs))
+}
+
+func TestParseVariableAppending(t *testing.T) {
+	_ = os.Setenv("TEST_1", "Kropotkin")
+	newVarAsStr := parseVariableAppending("TEST_1+NEW=Bakunin")
+
+	assert.Equal(t, "TEST_1=Kropotkin:Bakunin", newVarAsStr)
+}
+
+func TestParseVariableAppending_IgnoresExtraPlus(t *testing.T) {
+	_ = os.Setenv("TEST_2", "Kropotkin")
+	newVarAsStr := parseVariableAppending("TEST_2+NEW+EXTRAPLUS=Bakunin")
+
+	assert.Equal(t, "TEST_2=Kropotkin:Bakunin", newVarAsStr)
+}
+
+func TestParseVariableAppending_DoesNothingIfPlusNotPresent(t *testing.T) {
+	_ = os.Setenv("TEST_3", "Kropotkin")
+	newVarAsStr := parseVariableAppending("TEST_3=Bakunin")
+
+	assert.Equal(t, "TEST_3=Bakunin", newVarAsStr)
+}
+
+func TestParsingEnvironmentVariable(t *testing.T) {
+	name, value := parseEnvironmentVariable("HELLO=Anarchism")
+
+	assert.Equal(t, "HELLO", name)
+	assert.Equal(t, "Anarchism", value)
 }
