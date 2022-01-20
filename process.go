@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
 )
 
@@ -15,9 +16,23 @@ func getProcessName(args []string) string {
 
 func StartProcess(processName string, processArgs []string, extraEnv []string) *exec.Cmd {
 	cmd := exec.Command(processName, processArgs...)
+
 	if extraEnv != nil {
 		cmd.Env = append(os.Environ(), extraEnv...)
+
+		// #2: Support for setting workdir (PWD)
+		for _, envAsStr := range extraEnv {
+			if strings.Contains(envAsStr, "PWD=") {
+				name, value := parseEnvironmentVariable(envAsStr)
+
+				_ = os.Setenv(name, value)
+				cmd.Dir = os.Getenv("PWD")
+
+				break
+			}
+		}
 	}
+
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
