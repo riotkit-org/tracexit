@@ -79,5 +79,5 @@ exit_code, stream = container.exec_run(['tracexit', 'some-command'], stream=True
 ### Example - with `kubectl`
 
 ```bash
-kubectl exec -it deployment/my-deployment-name -- tracexit env:PWD=/mnt/
+kubectl exec -it deployment/my-deployment-name -- tracexit env:PWD=/mnt/ some-command-here
 ```
