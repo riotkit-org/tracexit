@@ -29,7 +29,6 @@ func main() {
 	code := waitAndRetrieveStatusCode(cmd)
 
 	whereToSaveExitCode := os.Getenv("TRACEXIT_EXIT_CODE_PATH")
-	println("!!!", whereToSaveExitCode)
 	if whereToSaveExitCode != "" {
 		if err := saveExitCode(code, whereToSaveExitCode); err != nil {
 			log.Errorf("Cannot write status to file: %v", err)
