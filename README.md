@@ -14,6 +14,20 @@ To use `--help` / `-h` it must be written as first argument, right after `tracex
 **Environment variables:**
 - TRACEXIT_EXIT_CODE_PATH: File location where to store exit code of a process when it exits
 
+## Getting tracexit
+
+Take a look at releases tab and pick a version suitable for your platform. We support Unix-like platforms, there is no support for Windows.
+
+You can use [eget](https://github.com/zyedidia/eget) as a 'package manager' to install `tracexit`
+
+```bash
+# for pre-release
+eget --pre-release riotkit-org/tracexit --to /usr/local/bin/tracexit
+
+# for latest stable release
+eget riotkit-org/tracexit --to /usr/local/bin/tracexit
+```
+
 ## Usage examples
 
 ### Export exit code to file "/tmp/exit-code" after process finishes.
